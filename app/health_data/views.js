@@ -1,6 +1,27 @@
 var Data = require('./models');
 var User = require('../user/models/user');
 var ObjectId = require('mongodb').ObjectID;
+var parsers = require('./parsers')
+
+exports.test_insert_data = function(req, res, next){
+    var doc = req.body;
+    console.log(doc)
+    
+    parsers.heart_rate_validation(doc).then(
+        result => {
+            console.log(result)
+            res.status(201).send({
+                error: result
+            })
+        },
+        error => {
+            console.log(error)
+            res.status(404).send({
+                error: error
+            })
+        }
+    )
+}
 
 exports.insertData = function (req, res, next) { //save
     var doc = req.body;

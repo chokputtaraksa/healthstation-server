@@ -42,6 +42,7 @@ module.exports = function(app){
     // Data Routes
     apiRoutes.use('/data', dataRoutes);
 
+    dataRoutes.post('/testing', DataView.test_insert_data);
     dataRoutes.get('/allLatest', DataView.getLatestData);
     dataRoutes.get('/period', requireAuth, DataView.findPeriodDataByType);
     dataRoutes.get('/latest', requireAuth, DataView.findLatestDataByType);

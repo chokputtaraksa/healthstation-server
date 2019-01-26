@@ -85,7 +85,7 @@ exports.register_finger_print = function(req, res, next){ // register FINGER_PRI
     var info = req.body;
     var station_key = req.headers['x-station-key'];
     var provider_key =  req.headers['x-provider-key'];
-
+    console.log(info)
     if(station_key && provider_key){
         try{
             query_dict = {
