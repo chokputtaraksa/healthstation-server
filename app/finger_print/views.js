@@ -75,7 +75,7 @@ exports.finger_print_login = function(req, res, next){
 
                     res.status(200).json({
                         token: 'JWT ' + generateToken(user),
-                        user: user
+                        data: user[0]
                     });
                 })
 

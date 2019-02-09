@@ -24,7 +24,6 @@ var healthDataSchema = new mongoose.Schema({
         date_time: {
                 type: Date,
                 require: true,
-                unique: true,
         }
 }, {
                 timestamps: true,
