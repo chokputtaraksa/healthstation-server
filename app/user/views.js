@@ -7,6 +7,9 @@ var Station = require('../station/models');
 var config = require('../../configs');
     rand = require('random-key');
 
+var logging = require('../utils/logging');
+var logger = logging.get_logger("user");
+
 function generateToken(user){
     info = {
         _id: user._id,
@@ -36,16 +39,24 @@ exports.login = function(req, res, next){
         };
         Station.findOne(query_dict ,(err, result)=>{
             if(err){
+                logger.warn(err)
                 res.status(404).send({err:err.message});
                     return next(err);
             }
+            if(!result){
+                logger.warn("Cannot find station key: " + station_key)
+                res.status(404).send({err: "Cannot find station key: " + station_key});
+                    return next(err);
+            }
             var userInfo = getInfoStationLogin(req.user);
+            logger.debug("Login success as user: " + userInfo)
             res.status(200).json({
                 token: 'JWT ' + generateToken(userInfo),
                 data: userInfo
             });
         })
     }catch(e){
+        logger.error(e)
         return res.status(500).send({error: e.message});
     }
 }
@@ -66,6 +77,7 @@ exports.mobile_login = function(req, res, next){
             });
         }
     }catch(e){
+        logger.error(e)
         return res.status(500).send({error: e.message});
     }
 }
@@ -76,14 +88,10 @@ exports.register = function(req, res, next){ // register ID_CARD
     var provider_key =  req.headers['x-provider-key'];
     var idNumber = info.idNumber;
     var finger_print = info.fingerPrint
-    if(!idNumber){
-        return res.status(422).send({error: 'Missing Id number'});
-    }
-    if(!finger_print){
-        return res.status(422).send({error: 'Missing fingerPrint'});
-    }
-    if(!station_key || !provider_key){
-        return res.status(400).send({error: 'Missing require header(s).'});
+    logger.debug("Start register user with data: " + info)
+    if(!station_key || !provider_key || !finger_print || !idNumber){
+        logger.warn( 'Missing require header(s).')
+        return res.status(422).send({error: 'Missing require header(s).'});
     }
     try{
         query_dict = {
@@ -92,6 +100,7 @@ exports.register = function(req, res, next){ // register ID_CARD
         };
         Station.findOne(query_dict, (err, station)=>{
             if(err){
+                logger.warn(err)
                 res.status(404).send({err:err.message});
                     return next(err);
             }
@@ -101,11 +110,13 @@ exports.register = function(req, res, next){ // register ID_CARD
                     User.findOne({"id_card.idNumber": idNumber}, function(err, existingUser){
 
                         if(err){
-                            res.status(404).send({err:'MongoDB cannot find this user'});
+                            logger.warn(err)
+                            res.status(404).send({err: err.message});
                             return next(err);
                         }
                         if(existingUser){
-                            res.status(409).send({error: 'this id number is already exist'});
+                            logger.warn('this id number: ' + idNumber + ' is already exist')
+                            res.status(409).send({error: 'this id number: ' + idNumber + ' is already exist'});
                             return next(err);
                         }
                         birth_date = new Date(info.birthOfDate);
@@ -132,7 +143,8 @@ exports.register = function(req, res, next){ // register ID_CARD
 
                         user.save(function(err, user){
                             if(err){
-                                res.status(409).send({error: 'MongoDB cannot connect'});
+                                logger.warn(err)
+                                res.status(409).send({error: err.message});
                                 return next(err);
                             }
                             var finger_print = new FingerPrint({
@@ -141,7 +153,8 @@ exports.register = function(req, res, next){ // register ID_CARD
                             })
                             finger_print.save((error, finger_print) => {
                                 if(error){
-                                    res.status(409).send({error: 'MongoDB cannot connect'});
+                                    logger.warn(error)
+                                    res.status(409).send({error: error.message});
                                     return next(err);
                                 }
                                 var userInfo = getInfoAfterRegister(user);
@@ -153,13 +166,16 @@ exports.register = function(req, res, next){ // register ID_CARD
                         });
                     })
                 }else{
-                    return res.status(400).send({error : 'Missing field in json'});
+                    logger.warn('Missing required field in user data')
+                    return res.status(400).send({error : 'Missing required field'});
                 }
             }else{
+                logger.warn('Cannot find station')
                 return res.status(404).send({error: 'Cannot find station'});
             }
         })
     }catch(e){
+        logger.error(e)
         return res.status(500).send({error: e.message});
     }
 }
@@ -286,6 +302,8 @@ exports.profileChanging = function(req, res, next){
             return res.status(200).json({err:false, message:'Update success'})
         });
     }catch(e){
+        var message = 
+        logger.error()
         return res.status(500).send({error: e.message});
     }
 }

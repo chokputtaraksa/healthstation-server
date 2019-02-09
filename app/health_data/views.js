@@ -2,11 +2,16 @@ var Data = require('./models');
 var User = require('../user/models/user');
 var ObjectId = require('mongodb').ObjectID;
 
+var logging = require('../utils/logging');
+var logger = logging.get_logger("health_data");
+
 exports.insertData = function (req, res, next) { //save
     var doc = req.body;
     var user_id = req.headers['user_id'];
+    logger.debug("Incoming messages: " + doc);
     try{
         if (!user_id) {
+            logger.warn('Missing require header');
             return res.status(400).send({
                 error: 'Missing require header'
             });
@@ -16,13 +21,15 @@ exports.insertData = function (req, res, next) { //save
             }, function (err, existingUser) {
                 var arr = {};
                 if (err) {
+                    logger.error(err)
                     return res.status(500).send({
-                        error: 'Internal server error due to : ' + err
+                        error: 'Internal server error due to : ' + err.message
                     });
                 }
                 if (!existingUser) {
+                    logger.warn('Cannot find this user: ' + user_id)
                     return res.status(404).send({
-                        error: 'Cannot find this user.'
+                        error: 'Cannot find this user: '+ user_id
                     });
                 }
                 arr = {}
@@ -50,6 +57,7 @@ exports.insertData = function (req, res, next) { //save
                     arr['unit']= doc.heart_rate.unit;
                     arr['type']= "heartrate";
                 } else {
+                    logger.warn('Data schema error')
                     return res.status(400).send({
                         error: 'Data schema error'
                     });
@@ -65,15 +73,16 @@ exports.insertData = function (req, res, next) { //save
                 data.save(function (err, data) {
                     if (err) {
                         if (err.code == 11000) {
+                            logger.error('Duplicate data: ' + err)
                             return res.status(406).send({
-                                error: 'Duplicate data'
+                                error: 'Duplicate data: ' + err
                             });
                         }
+                        logger.error(err)
                         return res.status(500).send({
                             error: 'Internal server error due to : ' + err
                         });
                     }
-
                     return res.status(201).send({
                         error: false
                     })
@@ -82,6 +91,7 @@ exports.insertData = function (req, res, next) { //save
             });
         }
     }catch(e){
+        logger.error(err)
         return res.status(500).send({error: e.message});
     }
 }

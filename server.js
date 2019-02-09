@@ -29,4 +29,3 @@ process.on('uncaughtException', function (err) {
 
 // Start app
 app.listen(process.env.PORT || 8080);
-logger.info("App listening on port 8080");
