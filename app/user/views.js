@@ -160,7 +160,7 @@ exports.register = function(req, res, next){ // register ID_CARD
                                 var userInfo = getInfoAfterRegister(user);
                                 res.status(201).json({
                                     token: 'JWT ' + generateToken(userInfo),
-                                    user: userInfo
+                                    data: userInfo
                                 })
                             })
                         });
