@@ -36,6 +36,7 @@ var UserSchema = new mongoose.Schema({
                 },
                 phone: String,
                 email: String,
+                profile_image: String
         },
         about_patient: {
                 bloodtype: {

@@ -9,5 +9,7 @@ module.exports = {
     },
     'hashsalt' : 10,
     'log_root': '/var/logs/healthios_server',
-    'log_module': ['finger_print', 'health_data', 'provider', 'station', 'user', 'api']
+    'log_module': ['finger_print', 'health_data', 'provider', 'station', 'user', 'api'],
+    'PORT': "8080",
+    'MEDIA_HOST': 'localhost:8080'
 }

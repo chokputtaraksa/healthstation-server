@@ -2,11 +2,11 @@ var passportService = require('./utils/passport'),
     StationView = require('./station/views'),
     DataView = require('./health_data/views'),
     UserView = require('./user/views'),
+    ImageView = require('./media/views'),
     FingerprintView = require('./finger_print/views'),
     ProviderAuthenController = require('./provider/views'),
-    logging = require('./utils/logging');
-var logger = logging.get_logger("api");
-
+    logging = require('./utils/logging'),
+    multer = require("./utils/multer"),
     express = require('express'),
     passport = require('passport');
 
@@ -46,6 +46,9 @@ module.exports = function(app){
     dataRoutes.get('/period', requireAuth, DataView.findPeriodDataByType);
     dataRoutes.get('/latest', requireAuth, DataView.findLatestDataByType);
     dataRoutes.post('/save', DataView.insertData);
+
+    dataRoutes.post('/image', multer.upload.single('profileImage'), ImageView.upload_profile_image);
+    dataRoutes.get('/image/:id', ImageView.get_image);
 
     dataRoutes.get('/fingerprint', FingerprintView.get_finger_print);
 

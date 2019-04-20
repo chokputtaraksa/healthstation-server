@@ -3,6 +3,7 @@ var app      = express();
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var cors = require('cors');
+var configs = require('./configs');
 
 var databaseConfig = require('./configs');
 var router = require('./app/routes');
@@ -17,6 +18,9 @@ mongoose.connect(databaseConfig.database_url);
 // Request body parser
 app.use(bodyParser.urlencoded({ extended: false })); // Parses urlencoded bodies
 app.use(bodyParser.json()); // Send JSON responses
+
+app.use(express.static('uploads'))
+
 // CORS
 app.use(cors());
 // Route
@@ -28,4 +32,4 @@ process.on('uncaughtException', function (err) {
 });
 
 // Start app
-app.listen(process.env.PORT || 8080);
+app.listen( configs.PORT || 8080);
