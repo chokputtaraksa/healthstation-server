@@ -3,8 +3,6 @@ var User = require('../user/models/user');
 const path = require('path');
 const configs = require('../../configs');
 
-const AVAILABLE_IMAGE_TYPE = ["PROFILE"]
-
 exports.upload_profile_image = function(req, res, next){
     var user_id =  req.headers['x-user-key'];
     var image_path = path.join(configs.MEDIA_HOST, req.file.path.slice(7));

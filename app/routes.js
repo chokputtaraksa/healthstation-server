@@ -48,7 +48,6 @@ module.exports = function(app){
     dataRoutes.post('/save', DataView.insertData);
 
     dataRoutes.post('/image', multer.upload.single('profileImage'), ImageView.upload_profile_image);
-    dataRoutes.get('/image/:id', ImageView.get_image);
 
     dataRoutes.get('/fingerprint', FingerprintView.get_finger_print);
 
