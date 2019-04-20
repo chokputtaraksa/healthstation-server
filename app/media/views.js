@@ -5,7 +5,7 @@ const configs = require('../../configs');
 
 exports.upload_profile_image = function(req, res, next){
     var user_id =  req.headers['x-user-key'];
-    var image_path = path.join(configs.MEDIA_HOST, req.file.path.slice(7));
+    var image_path = "http://" + path.join(configs.MEDIA_HOST, req.file.path.slice(7));
     res.status(201).json({
         data: image_path
     });
